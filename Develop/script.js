@@ -1,39 +1,31 @@
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
-$(function () {
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
-});
-
-var currentDayEl = $('#currentDay');
-setInterval( function() {
-  currentDay = dayjs().format('D/M/YYYY - h:m')
-  currentDayEl.text(currentDay)
-},1000)
-
 $(document).ready(function(){
-  var start = 3, end = 14, mainEl = $('main')
+  var body = $('body')
+  var headerEl = $('<header>').attr({
+    "class" : "p-5 mb-4",
+  })
+  var h1El = $('<h1>').attr({
+    "class" : "display-3",
+  }).text('Work Day Scheduler')
+  var pEl = $('<p>').attr({
+    "class" : "lead",
+  }).text('A simple calendar app for scheduling your work day')
+  var timeEl = $('<time>').attr({
+    "class" : "lead",
+    "id" : "currentDay"
+  }).text(dayjs().format('D/M/YYYY - h:mm'))
+  setInterval( function() {
+    currentDay = dayjs().format('D/M/YYYY - h:mm')
+    timeEl.text(currentDay)
+  },1000)
+  body.prepend(headerEl.append(
+    h1El,
+    pEl,
+    timeEl,
+  ))
+  var start = 8, end = 20, mainEl = $('main')
   for(i=start ; i<end ; i++) {
     var elementHour = dayjs().startOf('day').add(i,'hour')
     var diff = dayjs().diff(elementHour,"hour",true)
-    console.log(diff,diff<0,diff>0,diff===0)
     if(diff > 1) {
       var pastPresentFuture = "past"
     } else if (diff < 0) {
@@ -47,14 +39,23 @@ $(document).ready(function(){
     })
     var divEl = $("<div>").attr({
       "class" : "col-2 col-md-1 hour text-center py-3",
-    }).text(dayjs().startOf('day').add(i,'hour').format('hA'))
+    }).text(elementHour.format('hA'))
+    var localText = ""
+    if (localStorage.getItem(`texthour${i}`) !== null) {
+      var localText = localStorage.getItem(`texthour${i}`)
+    }
     var textareaEl = $('<textarea>').attr({
       "class" : "col-8 col-md-10 description",
       'row' : '3'
-    })
+    }).text(localText)
     var buttonEl = $('<button>').attr({
       "aria-label" : `save`,
       "class" : "btn saveBtn col-2 col-md-1",
+      "data-texthour" : `texthour${i}`,
+    }).click(function() {
+      var texthour = $(this).data("texthour");
+      var textarea = $(this).siblings("textarea").val()
+      localStorage.setItem(texthour,textarea );
     })
     var iEl = $('<i>').attr({
       'class' : 'fas fa-save',
