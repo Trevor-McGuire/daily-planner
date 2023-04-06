@@ -21,3 +21,9 @@ $(function () {
   //
   // TODO: Add code to display the current date in the header of the page.
 });
+
+var currentDayEl = document.querySelector("#currentDay")
+setInterval( function() {
+  currentDay = dayjs().format('D/M/YYYY - h:m')
+  currentDayEl.textContent = currentDay;
+},1000)
