@@ -22,8 +22,52 @@ $(function () {
   // TODO: Add code to display the current date in the header of the page.
 });
 
-var currentDayEl = document.querySelector("#currentDay")
+var currentDayEl = $('#currentDay');
 setInterval( function() {
   currentDay = dayjs().format('D/M/YYYY - h:m')
-  currentDayEl.textContent = currentDay;
+  currentDayEl.text(currentDay)
 },1000)
+
+$(document).ready(function(){
+  var start = 3, end = 14, mainEl = $('main')
+  for(i=start ; i<end ; i++) {
+    var elementHour = dayjs().startOf('day').add(i,'hour')
+    var diff = dayjs().diff(elementHour,"hour",true)
+    console.log(diff,diff<0,diff>0,diff===0)
+    if(diff > 1) {
+      var pastPresentFuture = "past"
+    } else if (diff < 0) {
+      var pastPresentFuture = "future"
+    } else {
+      var pastPresentFuture = "present"
+    }
+    var sectionEl = $("<section>").attr({
+      "id" : `hour${i}`,
+      "class" : `row time-block ${pastPresentFuture}`,
+    })
+    var divEl = $("<div>").attr({
+      "class" : "col-2 col-md-1 hour text-center py-3",
+    }).text(dayjs().startOf('day').add(i,'hour').format('hA'))
+    var textareaEl = $('<textarea>').attr({
+      "class" : "col-8 col-md-10 description",
+      'row' : '3'
+    })
+    var buttonEl = $('<button>').attr({
+      "aria-label" : `save`,
+      "class" : "btn saveBtn col-2 col-md-1",
+    })
+    var iEl = $('<i>').attr({
+      'class' : 'fas fa-save',
+      'aria-hidden' : "true"
+    })
+    mainEl.append(
+      sectionEl.append(
+        divEl,
+        textareaEl,
+        buttonEl.append(
+          iEl
+        )
+      )
+    )
+  }
+})
